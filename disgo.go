@@ -26,21 +26,27 @@ func main() {
 		log.Fatalf("Couldn't create session: %v", err)
 	}
 
+	// add via feature flags
+	s.AddHandler(LuckyWheelHandler)
+	s.AddHandler(ready)
+
 	// 'Open()' starts the bot session
 	if err = s.Open(); err != nil {
 		log.Fatalf("Couldn't open session: %v", err)
 	}
 	defer s.Close()
 
-	// add via feature flags
-	s.AddHandler(LuckyWheelHandler)
-
 	// add intents via command requirement
-	s.Identify.Intents = discordgo.IntentsGuilds | discordgo.IntentsGuildPresences
+	//s.Identify.Intents = discordgo.IntentsGuilds | discordgo.IntentsGuildPresences
+	s.Identify.Intents = discordgo.IntentsAll
 
 	// bot blocks until kill signal recieved
 	kill := make(chan os.Signal)
 	signal.Notify(kill, os.Interrupt)
 	<-kill
 	log.Println("Shuting down...")
+}
+
+func ready(s *discordgo.Session, r *discordgo.Ready) {
+	log.Println("Bot is up!")
 }

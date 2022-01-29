@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+    "math/rand"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -35,8 +36,13 @@ func LuckyWheelHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			},
 		})
 		onlineMembers, err := onlineMembersForGuild(s, i.Interaction.GuildID)
+        log.Printf("Length of onlineMembers: %v", len(onlineMembers))
+        index := 0
+        if len(onlineMembers) > 1 {
+            index = rand.Intn(len(onlineMembers)-1)
+        }
 		s.FollowupMessageCreate(s.State.User.ID, i.Interaction, true, &discordgo.WebhookParams{
-			Content: onlineMembers[0].Mention(),
+			Content: onlineMembers[index].Mention(),
 		})
 		if err != nil {
 			s.FollowupMessageCreate(s.State.User.ID, i.Interaction, true, &discordgo.WebhookParams{
@@ -101,8 +107,8 @@ func onlineMembersForGuild(s *discordgo.Session, guildID string) ([]*discordgo.M
 	log.Printf("GuildID: %v\n", guildID)
 	log.Printf("Guild Info: %v\n", g)
 	log.Printf("Guild Members: %v\n", g.Members)
-	log.Printf("A member mentioned: %s\n", g.Members[0].Mention())
-	log.Printf("Guild Presences: %v\n", g.Presences)
+	//log.Printf("A member mentioned: %s\n", g.Members[0].Mention())
+	//log.Printf("Guild Presences: %v\n", g.Presences)
 
 	return g.Members, nil
 }
